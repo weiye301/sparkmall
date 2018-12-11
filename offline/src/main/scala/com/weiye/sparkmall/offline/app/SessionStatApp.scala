@@ -7,7 +7,7 @@ import com.alibaba.fastjson.{JSON, JSONObject}
 import com.weiye.sparkmall.common.model.UserVisitAction
 import com.weiye.sparkmall.common.util.{ConfigurationUtil, JdbcUtil}
 import com.weiye.sparkmall.offline.bean.{CategorySessionTop, CategoryTopN, SessionInfo}
-import com.weiye.sparkmall.offline.util.{CategoryActionCountAccumulator, SessionAccumulator}
+import com.weiye.sparkmall.offline.util.{CategoryActionCountAccumulator, CityReamrkUDAF, SessionAccumulator}
 import org.apache.commons.configuration2.FileBasedConfiguration
 import org.apache.spark.SparkConf
 import org.apache.spark.broadcast.Broadcast
@@ -36,20 +36,32 @@ object SessionStatApp {
     //3 求 session总数量，
     val sessionCount: Long = sessionRDD.count()
 
-    //需求1
-    val conditionJsonString: String = sessionStepVisitTime(taskId, sparkSession, sessionCount, userVisitActionRDD, sessionRDD)
+    //    //需求1
+    //    val conditionJsonString: String = sessionStepVisitTime(taskId, sparkSession, sessionCount, userVisitActionRDD, sessionRDD)
+    //
+    //    //需求2
+    //    randomSession(taskId, sessionCount, sessionRDD, sparkSession)
+    //
+    //    //需求3
+    //    val categoryTop10: List[CategoryTopN] = CategoryTop10(taskId, sparkSession, userVisitActionRDD)
+    //
+    //    //需求4
+    //    statCategorySession(taskId, sparkSession, categoryTop10, userVisitActionRDD)
+    //
+    //    //需求5
+    //    pageConvertRatio(taskId, sparkSession, conditionJsonString, userVisitActionRDD)
 
-    //需求2
-    randomSession(taskId, sessionCount, sessionRDD, sparkSession)
+    //需求6
+    AreaTop3Product(sparkSession)
+  }
 
-    //需求3
-    val categoryTop10: List[CategoryTopN] = CategoryTop10(taskId, sparkSession, userVisitActionRDD)
 
-    //需求4
-    statCategorySession(taskId, sparkSession, categoryTop10, userVisitActionRDD)
-
-    //需求5
-    pageConvertRatio(taskId, sparkSession, conditionJsonString, userVisitActionRDD)
+  def AreaTop3Product(sparkSession: SparkSession): Unit = {
+    sparkSession.udf.register("city_remark", new CityReamrkUDAF())
+    sparkSession.sql("use sparkmall")
+    sparkSession.sql("select c.area,p.product_id,p.product_name,city_name from user_visit_action v join city_info c on v.city_id=c.city_id join product_info p on p.product_id=v.click_product_id").createOrReplaceTempView("area_product_click_detail")
+    sparkSession.sql("select area,product_id,product_name,count(*) clickcount,city_remark(city_name) cityremark from area_product_click_detail group by area,product_id,product_name").createOrReplaceTempView("area_product_click_count")
+    sparkSession.sql("select area,product_id,product_name,clickcount,cityremark from (select area,product_id,product_name,clickcount,row_number()over(partition by area order by clickcount desc) rk,cityremark from area_product_click_count )where rk<=3").show(100, false)
   }
 
   /**
