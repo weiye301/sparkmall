@@ -14,6 +14,7 @@
         <module>common</module>
         <module>mock</module>
         <module>offline</module>
+        <module>realtime</module>
     </modules>
     <properties>
         <spark.version>2.1.1</spark.version>

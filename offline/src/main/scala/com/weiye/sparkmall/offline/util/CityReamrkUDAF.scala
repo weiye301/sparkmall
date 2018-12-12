@@ -61,12 +61,12 @@ class CityReamrkUDAF extends UserDefinedAggregateFunction {
     val cityCountMap: Map[String, Long] = buffer.getAs[Map[String, Long]](0)
     val totalCount: Long = buffer.getLong(1)
     val cityCountInfoList: List[CityCountInfo] = cityCountMap.map { case (city_name, count) =>
-      CityCountInfo(city_name, count, Math.round(count / totalCount.toDouble * 1000) / 10.0)
+      CityCountInfo(city_name, count, Math.round(count / totalCount.toDouble * 10000) / 100.0)
     }.toList
     val cityInfoTop2List: List[CityCountInfo] = cityCountInfoList.sortWith((cityInfo1, cityInfo2) => cityInfo1.cityCount > cityInfo2.cityCount).take(2)
     if (cityCountInfoList.size > 2) {
-      var otherRatio: Double = 100.0
-      cityInfoTop2List.foreach(cityInfo => otherRatio -= cityInfo.cityRatio)
+      var otherRatio: Double = 100.00
+      cityInfoTop2List.foreach(cityInfo => otherRatio = Math.round((otherRatio - cityInfo.cityRatio) * 100) / 100.0)
       val withOtherInfoList: List[CityCountInfo] = cityInfoTop2List :+ CityCountInfo("其他", 0L, otherRatio)
       withOtherInfoList.mkString(",")
     } else {

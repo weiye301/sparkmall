@@ -24,17 +24,17 @@ object SessionStatApp {
     val sparkConf: SparkConf = new SparkConf().setMaster("local[*]").setAppName("offline")
     val sparkSession: SparkSession = SparkSession.builder().config(sparkConf).enableHiveSupport().getOrCreate()
 
-    val taskId: String = UUID.randomUUID().toString
-    //sessionStepVisitTime(taskId, sparkSession)
-    //1 \ 筛选  要关联用户  sql   join user_info  where  contidition  =>DF=>RDD[UserVisitAction]
-    val userVisitActionRDD: RDD[UserVisitAction] = getUserVisitActionRDD(sparkSession)
-
-    // 2  rdd=>  RDD[(sessionId,UserVisitAction)] => groupbykey => RDD[(sessionId,iterable[UserVisitAction])]
-    val sessionRDD: RDD[(String, Iterable[UserVisitAction])] = userVisitActionRDD.map(userVisitAction => (userVisitAction.session_id, userVisitAction)).groupByKey()
-    sessionRDD.cache()
-
-    //3 求 session总数量，
-    val sessionCount: Long = sessionRDD.count()
+    //    val taskId: String = UUID.randomUUID().toString
+    //    //sessionStepVisitTime(taskId, sparkSession)
+    //    //1 \ 筛选  要关联用户  sql   join user_info  where  contidition  =>DF=>RDD[UserVisitAction]
+    //    val userVisitActionRDD: RDD[UserVisitAction] = getUserVisitActionRDD(sparkSession)
+    //
+    //    // 2  rdd=>  RDD[(sessionId,UserVisitAction)] => groupbykey => RDD[(sessionId,iterable[UserVisitAction])]
+    //    val sessionRDD: RDD[(String, Iterable[UserVisitAction])] = userVisitActionRDD.map(userVisitAction => (userVisitAction.session_id, userVisitAction)).groupByKey()
+    //    sessionRDD.cache()
+    //
+    //    //3 求 session总数量，
+    //    val sessionCount: Long = sessionRDD.count()
 
     //    //需求1
     //    val conditionJsonString: String = sessionStepVisitTime(taskId, sparkSession, sessionCount, userVisitActionRDD, sessionRDD)
@@ -56,6 +56,11 @@ object SessionStatApp {
   }
 
 
+  /**
+    * 需求6:求出区域内排名前三的商品的点击量和各地区占有率
+    *
+    * @param sparkSession sparkSession
+    */
   def AreaTop3Product(sparkSession: SparkSession): Unit = {
     sparkSession.udf.register("city_remark", new CityReamrkUDAF())
     sparkSession.sql("use sparkmall")
