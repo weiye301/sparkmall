@@ -75,10 +75,10 @@ object RealtimeLogApp {
       jedisClient.close()
     }
 
-
     //需求7
     //按天+用户+广告 进行聚合,计算点击量
-    val userAdsCountPerDayDStream: DStream[(String, Long)] = filterRealtimeLogDStream.map { realtimelog =>
+    val userAdsCountPerDayDStream: DStream[(String, Long)]
+    = filterRealtimeLogDStream.map { realtimelog =>
       val key: String = realtimelog.userId + ":" + realtimelog.adsId + ":" + realtimelog.getDateString()
 
       (key, 1L)
@@ -104,6 +104,9 @@ object RealtimeLogApp {
 
 
     }
+
+    //需求9
+    AreaTop3AdsPerdayApp.calcTop3Ads(adsCountSumDStream)
 
     ssc.start()
     ssc.awaitTermination()
