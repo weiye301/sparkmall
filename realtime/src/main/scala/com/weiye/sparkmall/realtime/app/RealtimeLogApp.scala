@@ -1,7 +1,6 @@
 package com.weiye.sparkmall.realtime.app
 
-import java.{lang, util}
-import java.text.SimpleDateFormat
+import java.util
 import java.util.Date
 
 import com.weiye.sparkmall.common.util.{MyKafkaUtil, MyRedisUtil}
