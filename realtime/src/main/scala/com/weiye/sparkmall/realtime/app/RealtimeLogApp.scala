@@ -108,6 +108,9 @@ object RealtimeLogApp {
     //需求9
     AreaTop3AdsPerdayApp.calcTop3Ads(adsCountSumDStream)
 
+    //需求10
+    LastHourCountPerAds.calcLastHourCountPerAds(filterRealtimeLogDStream)
+
     ssc.start()
     ssc.awaitTermination()
   }

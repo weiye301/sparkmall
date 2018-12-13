@@ -15,4 +15,9 @@ case class RealtimeAdsLog(logdate: Date, area: String, city: String, userId: Str
     format.format(logdate)
   }
 
+  def getHourMinuString() = {
+    val format = new SimpleDateFormat("HH:mm")
+    format.format(logdate)
+  }
+
 }
