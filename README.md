@@ -1,3 +1,11 @@
+2018-12-12:更新
+
+    🌹增加MockerRealtime类:用于生产实时处理需要的数据;
+
+    🌹增加MyRealtiUtil类:建立redis连接池;
+
+    🌹增加realtime模块:用于实时处理数据.
+    
 这是一个电商分析项目
 
 目前有三个模块:✨
@@ -8,10 +16,4 @@
 
     3🎉.offline:离线数据分析模块,目前有六个功能,根据sparkSession来进行RDD运算.
 
-2018-12-12:更新
 
-    🌹增加MockerRealtime类:用于生产实时处理需要的数据;
-
-    🌹增加MyRealtiUtil类:建立redis连接池;
-
-    🌹增加realtime模块:用于实时处理数据.
